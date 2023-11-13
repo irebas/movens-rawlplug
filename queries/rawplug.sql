@@ -24,6 +24,7 @@ WITH t1 AS (
 		(SELECT value FROM params1 WHERE df_code = '6B') AS param_6b,
 		(SELECT value FROM params1 WHERE df_code = '6C') AS param_6c
 	FROM results r LEFT JOIN prices_logic pl ON r.indeks = pl.indeks
+	WHERE r.korekta_do IS NULL
 ),
 
 t2 AS (

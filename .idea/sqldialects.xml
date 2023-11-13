@@ -4,5 +4,6 @@
     <file url="file://$PROJECT_DIR$/main.py" dialect="SQLite" />
     <file url="file://$PROJECT_DIR$/queries/rawplug.sql" dialect="SQLite" />
     <file url="file://$PROJECT_DIR$/queries/summary.sql" dialect="SQLite" />
+    <file url="file://$PROJECT_DIR$/queries/summary_2.sql" dialect="SQLite" />
   </component>
 </project>

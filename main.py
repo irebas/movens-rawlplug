@@ -20,8 +20,10 @@ def insert_params():
 def get_summary():
     t0 = datetime.now()
     df = SQLite(DB_NAME).run_sql_query('queries/summary.sql')
+    df2 = SQLite(DB_NAME).run_sql_query('queries/summary_2.sql')
     ts = datetime.now().date().strftime('%Y%m%d')
     df.to_csv(f'outputs/summary_{ts}.csv', encoding='utf-8-sig')
+    df2.to_csv(f'outputs/summary2_{ts}.csv', encoding='utf-8-sig')
     print(f'Data extracted: {datetime.now() - t0}')
 
 
