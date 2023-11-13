@@ -1,3 +1,5 @@
+--DROP VIEW data_all
+--CREATE VIEW data_all AS
 WITH t1 AS (
 	SELECT
 		r.faktura,
@@ -15,8 +17,8 @@ WITH t1 AS (
 			ELSE ROUND(1000 / pl.logic_sztuki_w_opakowaniu * r.w_ilosc, 2)
 		END AS liczba_opakowan,
 		pl.product_group,
-		pl.logic_price_js,
-		pl.logic_catalog_price,
+		pl.unit * pl.price AS logic_price_js,
+		(SELECT value FROM params1 WHERE df_code = '0A') AS param_0a,
 		(SELECT value FROM params1 WHERE df_code = '4A') AS param_4a,
 		(SELECT value FROM params1 WHERE df_code = '4B') AS param_4b,
 		(SELECT value FROM params1 WHERE df_code = '4C') AS param_4c,
@@ -30,6 +32,7 @@ WITH t1 AS (
 t2 AS (
 	SELECT
 		t1.*,
+		t1.logic_price_js * (1 + t1.param_0a) AS logic_catalog_price,
 		CASE
 			WHEN t1.liczba_opakowan <= v2.small_volume THEN 'Small volume'
 			WHEN t1.liczba_opakowan > v2.big_volume THEN 'Big volume'
