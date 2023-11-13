@@ -1,0 +1,1 @@
+SELECT * FROM summary_2_no_js

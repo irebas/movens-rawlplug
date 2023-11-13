@@ -5,5 +5,8 @@
     <file url="file://$PROJECT_DIR$/queries/rawplug.sql" dialect="SQLite" />
     <file url="file://$PROJECT_DIR$/queries/summary.sql" dialect="SQLite" />
     <file url="file://$PROJECT_DIR$/queries/summary_2.sql" dialect="SQLite" />
+    <file url="file://$PROJECT_DIR$/queries/summary_2_no_js.sql" dialect="SQLite" />
+    <file url="file://$PROJECT_DIR$/queries/summary_no_js.sql" dialect="SQLite" />
+    <file url="file://$PROJECT_DIR$/queries/summary_view.sql" dialect="SQLite" />
   </component>
 </project>

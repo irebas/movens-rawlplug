@@ -24,7 +24,7 @@ WITH t1 AS (
 		(SELECT value FROM params1 WHERE df_code = '6B') AS param_6b,
 		(SELECT value FROM params1 WHERE df_code = '6C') AS param_6c
 	FROM results r LEFT JOIN prices_logic pl ON r.indeks = pl.indeks
-	WHERE r.korekta_do IS NULL
+	WHERE r.korekta_do IS NULL AND r.indeks IN (SELECT indeks FROM prices_logic) AND r.klient IN (SELECT klient FROM clients)
 ),
 
 t2 AS (
@@ -42,12 +42,13 @@ t3 AS (
 	SELECT
 		t2.*,
 		v3.discount_1,
-		c.discount_2,
+		p2.discount_2,
 		0 AS discount_3,
 		c.client_sr_termin * t2.param_4b / 30 * param_4a * param_4c AS discount_4,
 		param_6c AS discount_5,
-		COALESCE(v3.discount_1, 0) + COALESCE(c.discount_2, 0) + 0 + COALESCE((c.client_sr_termin * t2.param_4b / 30 * param_4a * param_4c), 0) + COALESCE(param_6c, 0) AS total_discount
+		COALESCE(v3.discount_1, 0) + COALESCE(p2.discount_2, 0) + 0 + COALESCE((c.client_sr_termin * t2.param_4b / 30 * param_4a * param_4c), 0) + COALESCE(param_6c, 0) AS total_discount
 	FROM t2 LEFT JOIN clients c ON t2.klient = c.klient
+	LEFT JOIN params2 p2 ON c.client_segment_1 = p2.client_segment_1 AND c.client_segment_2 = p2.client_segment_2
 	LEFT JOIN volume3 v3 ON t2.volume_level = v3.volume_level
 ),
 
@@ -86,7 +87,7 @@ t7 AS (
 	SELECT
 	    faktura, indeks, klient, w_ilosc, w_PLN, w_katal, kws_sa, product_group, masa_marzy_status_quo, cena_transakcyjna,
 	    liczba_opakowan, volume_level, discount_1, discount_2, discount_3, discount_4, discount_5, total_discount,
-	    logic_catalog_price, wartosc_sprzedazy_w_cenach_kat_z_logiki, cena_z_logiki_klient, wartosc_sprzedazy_w_cenach_z_logiki,
+	    logic_catalog_price, logic_price_js, wartosc_sprzedazy_w_cenach_kat_z_logiki, cena_z_logiki_klient, wartosc_sprzedazy_w_cenach_z_logiki,
 	    masa_marzy_w_cenach_z_logiki, cena_z_logiki_vs_transakcyjna, elast_cenowa, elast_volume, wartosc_sprzedazy_w_cenach_kat_elast,
 	    wartosc_sprzedazy_w_cenach_logika_elast, masa_marzy_elast
 	FROM t6
