@@ -21,17 +21,29 @@ def get_summary():
     t0 = datetime.now()
     df = SQLite(DB_NAME).run_sql_query('queries/summary.sql')
     ts = datetime.now().date().strftime('%Y%m%d')
-    df.to_csv(f'outputs/summary_{ts}.csv', encoding='utf-8')
+    df.to_csv(f'outputs/summary_{ts}.csv', encoding='utf-8-sig')
+    print(f'Data extracted: {datetime.now() - t0}')
+
+
+def get_sample_data(rows_nb: int):
+    t0 = datetime.now()
+    df = SQLite(DB_NAME).run_sql_query('queries/rawplug.sql')
+    df = df.head(rows_nb)
+    ts = datetime.now().date().strftime('%Y%m%d')
+    df.to_csv(f'outputs/sample_{ts}.csv', encoding='utf-8-sig')
     print(f'Data extracted: {datetime.now() - t0}')
 
 
 def main():
     code = input('Select function code:\nR - update results\nP - update params\n'
-                 'S - get summary to csv\nQ - quit\nCode: ')
+                 'S - get summary to csv\nD - get sample rows\nQ - quit\nCode: ')
     match code:
         case 'R': insert_results()
         case 'P': insert_params()
         case 'S': get_summary()
+        case 'D':
+            rows_nb = input('Provide rows nb: ')
+            get_sample_data(int(rows_nb))
         case 'Q': quit()
         case _: print('Wrong code')
     main()
