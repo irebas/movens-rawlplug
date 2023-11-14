@@ -19,13 +19,16 @@ WITH t1 AS (
 		pl.product_group,
 		pl.unit * pl.price AS logic_price_js,
 		(SELECT value FROM params1 WHERE df_code = '0A') AS param_0a,
+		(SELECT value FROM params1 WHERE df_code = '3A') AS param_3a,
 		(SELECT value FROM params1 WHERE df_code = '4A') AS param_4a,
 		(SELECT value FROM params1 WHERE df_code = '4B') AS param_4b,
 		(SELECT value FROM params1 WHERE df_code = '4C') AS param_4c,
 		(SELECT value FROM params1 WHERE df_code = '6A') AS param_6a,
 		(SELECT value FROM params1 WHERE df_code = '6B') AS param_6b,
-		(SELECT value FROM params1 WHERE df_code = '6C') AS param_6c
+		(SELECT value FROM params1 WHERE df_code = '6C') AS param_6c,
+		p.segment
 	FROM results r LEFT JOIN prices_logic pl ON r.indeks = pl.indeks
+	LEFT JOIN products p ON r.indeks = p.indeks
 	WHERE r.korekta_do IS NULL AND r.indeks IN (SELECT indeks FROM prices_logic) AND r.klient IN (SELECT klient FROM clients)
 ),
 
@@ -46,13 +49,14 @@ t3 AS (
 		t2.*,
 		v3.discount_1,
 		p2.discount_2,
-		0 AS discount_3,
+		IIF(s.segment IS NULL, 0, t2.param_3a) AS discount_3,
 		c.client_sr_termin * t2.param_4b / 30 * param_4a * param_4c AS discount_4,
 		param_6c AS discount_5,
-		COALESCE(v3.discount_1, 0) + COALESCE(p2.discount_2, 0) + 0 + COALESCE((c.client_sr_termin * t2.param_4b / 30 * param_4a * param_4c), 0) + COALESCE(param_6c, 0) AS total_discount
+		COALESCE(v3.discount_1, 0) + COALESCE(p2.discount_2, 0) + IIF(s.segment IS NULL, 0, t2.param_3a) + COALESCE((c.client_sr_termin * t2.param_4b / 30 * param_4a * param_4c), 0) + COALESCE(param_6c, 0) AS total_discount
 	FROM t2 LEFT JOIN clients c ON t2.klient = c.klient
 	LEFT JOIN params2 p2 ON c.client_segment_1 = p2.client_segment_1 AND c.client_segment_2 = p2.client_segment_2
 	LEFT JOIN volume3 v3 ON t2.volume_level = v3.volume_level
+	LEFT JOIN clients_segments s ON t2.klient = s.klient AND t2.segment = s.segment
 ),
 
 t4 AS (

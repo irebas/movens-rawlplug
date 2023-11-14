@@ -1,0 +1,28 @@
+CREATE VIEW segments AS
+WITH t1 AS (
+SELECT
+	r.klient,
+	p.segment,
+	SUM(w_PLN) AS total_sum
+FROM results r LEFT JOIN products p ON r.indeks = p.indeks
+GROUP BY 1,2
+)
+
+SELECT
+	klient,
+	segment
+FROM (
+	SELECT
+		klient,
+		segment,
+		total_sum,
+		ROW_NUMBER() OVER (PARTITION BY klient ORDER BY total_sum DESC) AS row_nb,
+		total_sum / SUM(total_sum) OVER (PARTITION BY klient) AS share
+	FROM t1
+)
+WHERE row_nb <= 2
+AND segment IN ('KOŁKI ROZPOROWE', 'KOŁKI FASADOWE WBIJANE', 'KOŁKI FASADOWE WKRĘCANE', 'KOTWY WKLEJANE W KARDRIDŻACH',
+'KOTWY WKLEJANE W ŁADUNKACH FOLIOWYCH CFS+', 'AMPUŁKI SZKLANE', 'KOTWY WKLEJANE - ZESTAWY', 'KOTWY OPASKOWE', 'ELEKTRONARZĘDZIA AKUMULATOROWE',
+'AKCESORIA ŚCIERNE I Z NASYPEM DIAMENTOWYM', 'WIERTŁA / DŁUTA', 'WKRĘTY DO DREWNA - CS', 'WKRĘTY DO DREWNA - TS', 'WKRĘTY DO DREWNA',
+'WKRĘTY DO PŁYT GIPSOWO-KARTONOWYCH')
+AND share > 0.15

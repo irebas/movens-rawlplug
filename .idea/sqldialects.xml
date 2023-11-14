@@ -6,7 +6,10 @@
     <file url="file://$PROJECT_DIR$/queries/summary.sql" dialect="SQLite" />
     <file url="file://$PROJECT_DIR$/queries/summary_2.sql" dialect="SQLite" />
     <file url="file://$PROJECT_DIR$/queries/summary_2_no_js.sql" dialect="SQLite" />
+    <file url="file://$PROJECT_DIR$/queries/summary_3.sql" dialect="SQLite" />
     <file url="file://$PROJECT_DIR$/queries/summary_no_js.sql" dialect="SQLite" />
-    <file url="file://$PROJECT_DIR$/queries/summary_view.sql" dialect="SQLite" />
+    <file url="file://$PROJECT_DIR$/queries/v_segments.sql" dialect="SQLite" />
+    <file url="file://$PROJECT_DIR$/queries/v_summary.sql" dialect="SQLite" />
+    <file url="file://$PROJECT_DIR$/queries/v_summary_3.sql" dialect="SQLite" />
   </component>
 </project>
