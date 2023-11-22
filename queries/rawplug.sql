@@ -8,8 +8,8 @@ WITH t1 AS (
 		r.w_ilosc,
 		r.w_PLN,
 		r.w_katal,
-		r.kws_sa,
-		r.w_PLN - r.kws_sa AS masa_marzy_status_quo,
+		pl.kws_sa,
+		r.w_PLN - pl.kws_sa AS masa_marzy_status_quo,
 		r.w_PLN / w_ilosc AS cena_transakcyjna,
 		CASE
 			WHEN r.jedn IN ('op', 'bl') THEN r.w_ilosc
