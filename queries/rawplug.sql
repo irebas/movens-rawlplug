@@ -1,5 +1,5 @@
---DROP VIEW data_all
---CREATE VIEW data_all AS
+DROP VIEW data_all;
+CREATE VIEW data_all AS
 WITH t1 AS (
 	SELECT
 		r.faktura,
@@ -9,8 +9,8 @@ WITH t1 AS (
 		r.w_PLN,
 		r.w_katal,
 		pl.kws_sa,
-		r.w_PLN - pl.kws_sa AS masa_marzy_status_quo,
-		r.w_PLN / w_ilosc AS cena_transakcyjna,
+		r.w_PLN - pl.kws_sa * r.w_ilosc AS masa_marzy_status_quo,
+		r.w_PLN / r.w_ilosc AS cena_transakcyjna,
 		CASE
 			WHEN r.jedn IN ('op', 'bl') THEN r.w_ilosc
 			WHEN r.jedn IN ('sz', 'kg') THEN ROUND(r.w_ilosc / pl.logic_sztuki_w_opakowaniu, 2)
@@ -65,7 +65,7 @@ t4 AS (
 		logic_catalog_price * w_ilosc AS wartosc_sprzedazy_w_cenach_kat_z_logiki,
 		(1 - total_discount) * logic_catalog_price AS cena_z_logiki_klient,
 		(1 - total_discount) * logic_catalog_price * w_ilosc AS wartosc_sprzedazy_w_cenach_z_logiki,
-		((1 - total_discount) * logic_catalog_price * w_ilosc) - kws_sa AS masa_marzy_w_cenach_z_logiki,
+		((1 - total_discount) * logic_catalog_price * w_ilosc) - kws_sa * w_ilosc AS masa_marzy_w_cenach_z_logiki,
 		((1 - total_discount) * logic_catalog_price) / cena_transakcyjna - 1 AS cena_z_logiki_vs_transakcyjna
 	FROM t3
 ),
@@ -85,19 +85,26 @@ t6 AS (
 		*,
 		IIF((cena_z_logiki_vs_transakcyjna * elast_cenowa + 1) * w_ilosc > 0, (cena_z_logiki_vs_transakcyjna * elast_cenowa + 1) * w_ilosc, 0) AS elast_volume,
 		IIF((cena_z_logiki_vs_transakcyjna * elast_cenowa + 1) * w_ilosc > 0, (cena_z_logiki_vs_transakcyjna * elast_cenowa + 1) * w_ilosc, 0) * logic_catalog_price AS wartosc_sprzedazy_w_cenach_kat_elast,
-		IIF((cena_z_logiki_vs_transakcyjna * elast_cenowa + 1) * w_ilosc > 0, (cena_z_logiki_vs_transakcyjna * elast_cenowa + 1) * w_ilosc, 0) * cena_z_logiki_klient AS wartosc_sprzedazy_w_cenach_logika_elast,
-		(cena_z_logiki_klient - kws_sa / w_ilosc) * IIF((cena_z_logiki_vs_transakcyjna * elast_cenowa + 1) * w_ilosc > 0, (cena_z_logiki_vs_transakcyjna * elast_cenowa + 1) * w_ilosc, 0) AS masa_marzy_elast
+		IIF((cena_z_logiki_vs_transakcyjna * elast_cenowa + 1) * w_ilosc > 0, (cena_z_logiki_vs_transakcyjna * elast_cenowa + 1) * w_ilosc, 0) * cena_z_logiki_klient AS wartosc_sprzedazy_w_cenach_logika_elast
+-- 		(cena_z_logiki_klient - kws_sa / w_ilosc) * IIF((cena_z_logiki_vs_transakcyjna * elast_cenowa + 1) * w_ilosc > 0, (cena_z_logiki_vs_transakcyjna * elast_cenowa + 1) * w_ilosc, 0) AS masa_marzy_elast
 	FROM t5
 ),
 
 t7 AS (
+    SELECT
+        *,
+        wartosc_sprzedazy_w_cenach_logika_elast - elast_volume * kws_sa AS masa_marzy_elast
+    FROM t6
+),
+
+t8 AS (
 	SELECT
 	    faktura, indeks, klient, w_ilosc, w_PLN, w_katal, kws_sa, product_group, masa_marzy_status_quo, cena_transakcyjna,
 	    liczba_opakowan, volume_level, discount_1, discount_2, discount_3, discount_4, discount_5, total_discount,
 	    logic_catalog_price, logic_price_js, wartosc_sprzedazy_w_cenach_kat_z_logiki, cena_z_logiki_klient, wartosc_sprzedazy_w_cenach_z_logiki,
 	    masa_marzy_w_cenach_z_logiki, cena_z_logiki_vs_transakcyjna, elast_cenowa, elast_volume, wartosc_sprzedazy_w_cenach_kat_elast,
 	    wartosc_sprzedazy_w_cenach_logika_elast, masa_marzy_elast
-	FROM t6
+	FROM t7
 )
 
-SELECT * FROM t7
+SELECT * FROM t8
